@@ -1,4 +1,5 @@
-import { request } from 'graphql-request'
+import { parse } from 'json2csv';
+import { request } from 'graphql-request';
 import * as fs from 'fs';
 
 
@@ -70,9 +71,15 @@ const getDateInfo = (data: UniswapExchangeHistoryEvent[]): DateInfo => {
     return { firstDate, lastDate };
 }
 
-const getFileName = (data: UniswapExchangeHistoryEvent[], ext: string = '.json') => {
+const getFileName = (data: UniswapExchangeHistoryEvent[]) => {
     const { firstDate, lastDate } = getDateInfo(data);
-    return `${firstDate.toISOString()} - ${lastDate.toISOString()}${ext}`;
+    return `${firstDate.toISOString()} - ${lastDate.toISOString()}`;
+}
+
+const toCSV = (data: UniswapExchangeHistoryEvent[]): string => {
+    const fields = ['id', 'tokenSymbol', 'type', 'timestamp', 'ethLiquidity', 'tokenLiquidity', 'ethBalance', 'tokenBalance', 'totalUniToken', 'price', 'feeInEth', 'tokenPriceUSD'];
+    const opts = { fields };
+    return parse(data, opts);
 }
 
 const scrape = async () => {
@@ -92,7 +99,8 @@ const scrape = async () => {
     console.log('Final data:');
     logForData(allData);
     const fileName = getFileName(allData);
-    fs.writeFileSync(`data/${fileName}`, JSON.stringify(allData));
+    fs.writeFileSync(`data/${fileName}.json`, JSON.stringify(allData));
+    fs.writeFileSync(`data/${fileName}.csv`, toCSV(allData));
 }
 
 scrape();

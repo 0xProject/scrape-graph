@@ -1,3 +1,4 @@
 data/*
 yarn-error.log
 node_modules
+index.js

@@ -11,9 +11,11 @@
     "init-ts": "tsc --init"
   },
   "dependencies": {
-    "graphql-request": "^1.8.2"
+    "graphql-request": "^1.8.2",
+    "json2csv": "^4.5.2"
   },
   "devDependencies": {
+    "@types/json2csv": "^4.5.0",
     "@types/node": "^12.6.8",
     "typescript": "^3.5.3"
   }
