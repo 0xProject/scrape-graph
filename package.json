@@ -1,0 +1,20 @@
+{
+  "name": "scrape-graph",
+  "version": "1.0.0",
+  "description": "scrape the graph protocol data",
+  "main": "index.js",
+  "author": "fragosti",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc -b",
+    "scrape": "node index.js",
+    "init-ts": "tsc --init"
+  },
+  "dependencies": {
+    "graphql-request": "^1.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^12.6.8",
+    "typescript": "^3.5.3"
+  }
+}
