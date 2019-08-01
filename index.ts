@@ -1,6 +1,7 @@
 import { parse } from 'json2csv';
 import { request } from 'graphql-request';
 import * as fs from 'fs';
+import * as R from 'ramda';
 
 
 // https://github.com/graphprotocol/uniswap-subgraph/blob/b2918504af5a43290314a6c719f92850add857d4/schema.graphql#L115
@@ -82,6 +83,10 @@ const toCSV = (data: UniswapExchangeHistoryEvent[]): string => {
     return parse(data, opts);
 }
 
+const dedupeHistoryEvents = R.uniqBy((event: UniswapExchangeHistoryEvent) =>{
+    return `${event.id}-${event.type}-${event.timestamp}-${event.ethLiquidity}-${event.tokenLiquidity}-${event.ethBalance}-${event.tokenBalance}-${event.totalUniToken}-${event.price}-${event.tokenPriceUSD}`
+});
+
 const scrape = async () => {
     let timestamp = 0;
     let allData: UniswapExchangeHistoryEvent[] = [];
@@ -94,9 +99,15 @@ const scrape = async () => {
         }
         allData = allData.concat(data);
         logForData(data);
-        timestamp = data[data.length - 1].timestamp;
+        const newTimestamp = data[data.length - 1].timestamp - 1;
+        if (newTimestamp !== timestamp) {
+            timestamp = newTimestamp;
+        } else {
+            break;
+        }
     }
     console.log('Final data:');
+    allData = dedupeHistoryEvents(allData);
     logForData(allData);
     const fileName = getFileName(allData);
     fs.writeFileSync(`data/${fileName}.json`, JSON.stringify(allData));
